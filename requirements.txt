@@ -1,0 +1,16 @@
+﻿fastapi
+uvicorn[standard]
+sqlalchemy
+alembic
+pydantic
+python-dotenv
+pymysql
+celery[redis]
+redis
+python-jose[cryptography]
+passlib[bcrypt]
+uvicorn[standard]
+pymysql
+pydantic-settings
+cryptography
+fastapi_jwt_auth
