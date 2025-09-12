@@ -1,28 +1,26 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_jwt_auth import AuthJWT
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from app.schemas.auth import UserLogin, Token
 from app.models.user import User
 from app.services.auth import verify_password
-from app.services.db import get_session
+from app.services.db import get_db
 from app.core.config import settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/login", response_model=Token)
-async def login(
+def login(
     data: UserLogin,
     Authorize: AuthJWT = Depends(),
-    db: AsyncSession = Depends(get_session)
+    db: Session = Depends(get_db)
 ):
-    result = await db.execute(select(User).filter_by(email=data.email))
-    user: User = result.scalars().first()
-    if not user or not verify_password(data.password, user.password if isinstance(user.password, str) else user.password.value):
-        raise HTTPException(401, "Invalid credentials")
-    # Usar el atributo de la instancia
+    user = db.query(User).filter(User.email == data.email).first()
+    if not user or not verify_password(data.password, user.password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
     token = Authorize.create_access_token(
-        subject=user.email if isinstance(user.email, str) else user.email.value,  # Ensure subject is a str
+        subject=user.email,
         expires_time=settings.ACCESS_TOKEN_EXPIRES,
         user_claims={"role": user.role_id}
     )

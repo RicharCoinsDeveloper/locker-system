@@ -57,9 +57,9 @@ def require_permission(permission: str):
     return decorator
 
 
-from pydantic import BaseSettings
+from pydantic import BaseModel
 
-class JWTSettings(BaseSettings):
+class JWTSettings(BaseModel):
     authjwt_secret_key: str = settings.JWT_SECRET
     authjwt_algorithm: str = settings.JWT_ALGORITHM
     authjwt_access_token_expires: int = settings.ACCESS_TOKEN_EXPIRES

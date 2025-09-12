@@ -4,7 +4,7 @@ from datetime import datetime
 class ClientBase(BaseModel):
     nombre: str = Field(..., min_length=3, max_length=50)
     email: EmailStr
-    phone: str = Field(..., min_length=8)
+    telefono: str = Field(..., min_length=8)
 class ClientCreate(ClientBase):
     pass
 
