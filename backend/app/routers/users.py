@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from app.schemas.user import UserCreate, UserRead
 from app.models.user import User
 from app.services.db import get_db
@@ -13,13 +12,14 @@ router = APIRouter(prefix="/users", tags=["users"])
     response_model=UserRead,
     dependencies=[Depends(require_permission("users:write"))]
 )
-async def create_user(
+def create_user(
     data: UserCreate,
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
-    result = await db.execute(select(User).filter_by(email=data.email))
-    if result.scalars().first():
-        raise HTTPException(400, "Email already registered")
+    existing_user = db.query(User).filter(User.email == data.email).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
     user = User(
         id=data.email,
         name=data.nombre,
@@ -29,8 +29,8 @@ async def create_user(
         password=hash_password(data.password)
     )
     db.add(user)
-    await db.commit()
-    await db.refresh(user)
+    db.commit()
+    db.refresh(user)
     return user
 
 @router.get(
@@ -38,12 +38,11 @@ async def create_user(
     response_model=UserRead,
     dependencies=[Depends(require_permission("users:read"))]
 )
-async def read_user(
+def read_user(
     user_id: str,
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
-    result = await db.execute(select(User).filter_by(id=user_id))
-    user = result.scalars().first()
+    user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise HTTPException(404, "User not found")
+        raise HTTPException(status_code=404, detail="User not found")
     return user
