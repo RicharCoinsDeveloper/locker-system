@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.client import ClientCreate, ClientRead
+from backend.app.schemas.customer import ClientCreate, ClientRead
 from app.models.customer import Customer
 from app.services.db import get_session
 from app.services.auth import require_permission

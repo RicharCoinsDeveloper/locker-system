@@ -6,6 +6,11 @@ from app.core.config import settings
 from app.routers import auth, users, customers, roles, permissions
 from app.services.db import engine
 from app.models import Base
+import logging
+
+# Configuración de logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Crear UNA SOLA instancia de FastAPI
 app = FastAPI(
@@ -26,17 +31,11 @@ app.add_middleware(
 )
 
 # Incluir routers
-app.include_router(auth.router, prefix="/api/v1")
-app.include_router(users.router, prefix="/api/v1")
-app.include_router(customers.router, prefix="/api/v1")
-app.include_router(roles.router, prefix="/api/v1")
-app.include_router(permissions.router, prefix="/api/v1")
-
-@app.on_event("startup")
-async def startup_event():
-    # Crear tablas si no existen
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+app.include_router(auth.router, prefix=f"/api/{settings.API_VERSION}")
+app.include_router(users.router, prefix=f"/api/{settings.API_VERSION}")
+app.include_router(customers.router, prefix=f"/api/{settings.API_VERSION}")
+app.include_router(roles.router, prefix=f"/api/{settings.API_VERSION}")
+app.include_router(permissions.router, prefix=f"/api/{settings.API_VERSION}")
 
 @app.get("/")
 async def root():
@@ -45,3 +44,4 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
