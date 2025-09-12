@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.user import UserCreate, UserRead
 from app.models.user import User
-from app.services.db import get_session
+from app.services.db import get_db
 from app.services.auth import hash_password, require_permission
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 )
 async def create_user(
     data: UserCreate,
-    db: AsyncSession = Depends(get_session)
+    db: AsyncSession = Depends(get_db)
 ):
     result = await db.execute(select(User).filter_by(email=data.email))
     if result.scalars().first():
@@ -40,7 +40,7 @@ async def create_user(
 )
 async def read_user(
     user_id: str,
-    db: AsyncSession = Depends(get_session)
+    db: AsyncSession = Depends(get_db)
 ):
     result = await db.execute(select(User).filter_by(id=user_id))
     user = result.scalars().first()
