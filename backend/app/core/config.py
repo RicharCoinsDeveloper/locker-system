@@ -1,30 +1,13 @@
-# backend/app/core/config.py
-
-from pydantic_settings import BaseSettings
-from typing import Optional
+﻿# backend/app/core/config.py
+from pydantic import BaseSettings
 
 class Settings(BaseSettings):
-    # Base de datos
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     MYSQL_URL: str = "mysql+pymysql://user:pass@127.0.0.1:3308/locker_db"
-    
-    # Redis
-    REDIS_URL: str = "redis://redis:6379/0"
-    
-    # RabbitMQ
-    RABBITMQ_URL: str = "amqp://guest:guest@rabbitmq:5672/"
-    
-    # JWT
-    JWT_SECRET: str = "your-super-secret-jwt-key-change-in-production"
-    JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRES: int = 3600  # 1 hora en segundos
-    
-    # API
-    API_VERSION: str = "v1"
-    
-    # Configuración del archivo .env
     class Config:
-        env_file = ".env"  # Ruta CORREGIDA
-        env_file_encoding = 'utf-8'
+        env_file = ".env"
+        validate_assignment = True
 
-# Instancia global de configuración
 settings = Settings()
