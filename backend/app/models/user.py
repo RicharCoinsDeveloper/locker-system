@@ -10,3 +10,4 @@ class User(Base):
     phone = Column(String(20))
     role_id = Column(String(36), ForeignKey('roles.id'))
     created_at = Column(DateTime)
+    password = Column(String(255), nullable=False)  # Campo CORREGIDO
