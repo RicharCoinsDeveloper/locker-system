@@ -49,17 +49,16 @@ def require_permission(permission: str):
             raise HTTPException(status_code=403, detail="Role not found in token")
         
         # Verificar permisos del rol desde la base de datos dinámicamente
-        perms = await get_permissions_by_role(role_id, db)
+        perms = await get_permissions_by_role(str(role_id), db)
         if permission not in perms:
             raise HTTPException(status_code=403, detail="Not authorized")
     return wrapper
 
-# Configuración JWT usando Pydantic
-class JWTSettings(BaseModel):
-    authjwt_secret_key: str = settings.JWT_SECRET
-    authjwt_algorithm: str = settings.JWT_ALGORITHM
-    authjwt_access_token_expires: int = settings.ACCESS_TOKEN_EXPIRES
 
 @AuthJWT.load_config
 def get_jwt_config():
-    return JWTSettings()
+    return {
+        "authjwt_secret_key": settings.JWT_SECRET,
+        "authjwt_algorithm": settings.JWT_ALGORITHM,
+        "authjwt_access_token_expires": settings.ACCESS_TOKEN_EXPIRES
+    }
