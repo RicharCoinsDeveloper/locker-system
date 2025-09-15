@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.routers import auth, users, customers, roles, permissions
-from app.services.db import engine
+from app.core.database import engine
 from app.models import Base
 import logging
 
